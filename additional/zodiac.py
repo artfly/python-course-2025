@@ -59,6 +59,7 @@ def convert_to_zodiac(fname: str):
         'Когда я разозлюсь, я могу потерять контроль над собой'
     ]
     header_department = 'Ваш факультет (сокращенно, например ФИТ)\nЕсли не учились в НГУ, поставьте прочерк'
+    header_sex = 'Пол'
 
     aggresions = []
 
@@ -73,8 +74,11 @@ def convert_to_zodiac(fname: str):
             print(f'Знак зодиака: {zodiac}')
             if not zodiac:
                 continue
+            sex = row[header_sex]
+            if sex != 'Женский' and sex != 'Мужской':
+                continue
             avg_aggr = sum([int(row[h]) for h in headers_aggression]) / 3
-            aggresions.append((zodiac, avg_aggr, department))
+            aggresions.append((zodiac, avg_aggr, department, sex))
     return aggresions
 
 
@@ -94,7 +98,7 @@ def average_zodiac_aggression(zodiacs: list):
         'Стрелец': [0, 0]
     }
 
-    for zodiac, aggr, _ in zodiacs:
+    for zodiac, aggr, _, _ in zodiacs:
         zodiac_aggr = aggression[zodiac]
         zodiac_aggr[0] += aggr
         zodiac_aggr[1] += 1
@@ -130,3 +134,10 @@ if __name__ == '__main__':
     fit_only = [record for record in zodiacs if record[2] == 'фит']
     avg_fit_aggression = average_zodiac_aggression(fit_only)
     print(repr_aggression(avg_fit_aggression))
+    print('***Агрессия девушек (общая)***')
+    female_aggression = [record[1] for record in zodiacs if record[3] == 'Женский']
+    print(f'Агрессия девушек: {round(sum(female_aggression) / len(female_aggression), 2)}')
+    print('***Агрессия парней (общая)***')
+    male_aggression = [record[1] for record in zodiacs if record[3] == 'Мужской']
+    print(f'Агрессия парней: {round(sum(male_aggression) / len(male_aggression), 2)}')
+    print(f'Вся агрессия: {[round(zodiac[1], 2) for zodiac in zodiacs]}')
